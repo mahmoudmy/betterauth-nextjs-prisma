@@ -23,7 +23,7 @@ const formSchema = z.object({
   name: z.string().min(1, "نام الزامی است"),
   email: z.string().email("ایمیل نامعتبر است"),
   password: z.string().min(6, "حداقل ۶ کاراکتر"),
-  username: z.string().optional(),
+  username: z.string(),
   role: z.enum(["user", "admin"]),
 });
 
@@ -46,7 +46,7 @@ export default function CreateUserDialog({ onCreated }: CreateUserDialogProps) {
       password: values.password,
       name: values.name,
       role: values.role,
-      data: values.username ? { username: values.username } : undefined,
+      data: { username: values.username },
     });
     setOpen(false);
     form.reset();
@@ -99,7 +99,7 @@ export default function CreateUserDialog({ onCreated }: CreateUserDialogProps) {
               name="username"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>نام کاربری (اختیاری)</FormLabel>
+                  <FormLabel>نام کاربری</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -133,7 +133,7 @@ export default function CreateUserDialog({ onCreated }: CreateUserDialogProps) {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="user">کاربر</SelectItem>
-                        <SelectItem value="admin">مدیر</SelectItem>
+                        <SelectItem value="admin">مدیر سیستم</SelectItem>
                       </SelectContent>
                     </Select>
                   </FormControl>

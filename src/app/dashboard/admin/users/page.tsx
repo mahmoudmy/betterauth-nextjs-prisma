@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { admin } from "@/lib/auth-client";
 import CreateUserDialog from "@/components/admin/create-user-dialog";
 import UserList from "@/components/admin/user-list";
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, PaginationEllipsis } from "@/components/ui/pagination";
+import { DataPagination } from "@/components/ui/data-pagination";
 
 interface User {
   id: string;
@@ -136,8 +136,7 @@ export default function AdminUsersPage() {
               <SelectContent>
                 <SelectItem value="all">همه نقش‌ها</SelectItem>
                 <SelectItem value="user">کاربر</SelectItem>
-                <SelectItem value="manager">مدیر میانی</SelectItem>
-                <SelectItem value="admin">مدیر</SelectItem>
+                <SelectItem value="admin">مدیر سیستم</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -162,141 +161,13 @@ export default function AdminUsersPage() {
             
           {/* Pagination Controls */}
           {meta.total && meta.total > pageSize && (
-            <div className="mt-6 space-y-4">
-              {/* Page Size Selector */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm text-muted-foreground">نمایش</span>
-                  <Select value={pageSize.toString()} onValueChange={(value) => setPageSize(Number(value))}>
-                    <SelectTrigger className="w-[80px]">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="10">10</SelectItem>
-                      <SelectItem value="25">25</SelectItem>
-                      <SelectItem value="50">50</SelectItem>
-                      <SelectItem value="100">100</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <span className="text-sm text-muted-foreground">مورد در هر صفحه</span>
-                </div>
-                <div className="text-sm text-muted-foreground">
-                  نمایش {((page - 1) * pageSize) + 1} تا {Math.min(page * pageSize, meta.total)} از {meta.total} مورد
-                </div>
-              </div>
-
-              {/* Pagination Navigation */}
-              <Pagination>
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious 
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        if (page > 1) setPage(page - 1);
-                      }}
-                      className={page <= 1 ? "pointer-events-none opacity-50" : ""}
-                    />
-                  </PaginationItem>
-                  
-                  {/* First page */}
-                  {page > 3 && (
-                    <PaginationItem>
-                      <PaginationLink 
-                        href="#" 
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setPage(1);
-                        }}
-                      >
-                        1
-                      </PaginationLink>
-                    </PaginationItem>
-                  )}
-                  
-                  {/* Ellipsis after first page */}
-                  {page > 4 && (
-                    <PaginationItem>
-                      <PaginationEllipsis />
-                    </PaginationItem>
-                  )}
-                  
-                  {/* Previous page */}
-                  {page > 2 && (
-                    <PaginationItem>
-                      <PaginationLink 
-                        href="#" 
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setPage(page - 1);
-                        }}
-                      >
-                        {page - 1}
-                      </PaginationLink>
-                    </PaginationItem>
-                  )}
-                  
-                  {/* Current page */}
-                  <PaginationItem>
-                    <PaginationLink 
-                      href="#" 
-                      isActive
-                      onClick={(e) => e.preventDefault()}
-                    >
-                      {page}
-                    </PaginationLink>
-                  </PaginationItem>
-                  
-                  {/* Next page */}
-                  {page < Math.ceil((meta.total || 0) / pageSize) - 1 && (
-                    <PaginationItem>
-                      <PaginationLink 
-                        href="#" 
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setPage(page + 1);
-                        }}
-                      >
-                        {page + 1}
-                      </PaginationLink>
-                    </PaginationItem>
-                  )}
-                  
-                  {/* Ellipsis before last page */}
-                  {page < Math.ceil((meta.total || 0) / pageSize) - 3 && (
-                    <PaginationItem>
-                      <PaginationEllipsis />
-                    </PaginationItem>
-                  )}
-                  
-                  {/* Last page */}
-                  {page < Math.ceil((meta.total || 0) / pageSize) - 2 && (
-                    <PaginationItem>
-                      <PaginationLink 
-                        href="#" 
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setPage(Math.ceil((meta.total || 0) / pageSize));
-                        }}
-                      >
-                        {Math.ceil((meta.total || 0) / pageSize)}
-                      </PaginationLink>
-                    </PaginationItem>
-                  )}
-                  
-                  <PaginationItem>
-                    <PaginationNext 
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        if (page < Math.ceil((meta.total || 0) / pageSize)) setPage(page + 1);
-                      }}
-                      className={page >= Math.ceil((meta.total || 0) / pageSize) ? "pointer-events-none opacity-50" : ""}
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
-            </div>
+            <DataPagination
+              total={meta.total}
+              page={page}
+              pageSize={pageSize}
+              onPageChange={setPage}
+              onPageSizeChange={setPageSize}
+            />
           )}
         </CardContent>
       </Card>

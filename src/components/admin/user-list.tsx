@@ -24,9 +24,7 @@ export default function UserList({ users, onEdit }: UserListProps) {
   const getRoleBadge = (role?: string) => {
     switch (role) {
       case "admin":
-        return <Badge variant="default" className="bg-red-100 text-red-800">مدیر</Badge>;
-      case "manager":
-        return <Badge variant="default" className="bg-blue-100 text-blue-800">مدیر میانی</Badge>;
+        return <Badge variant="default" className="bg-red-100 text-red-800">مدیر سیستم</Badge>;
       case "user":
         return <Badge variant="secondary">کاربر</Badge>;
       default:
@@ -49,7 +47,7 @@ export default function UserList({ users, onEdit }: UserListProps) {
             <TableHead>نقش</TableHead>
             <TableHead>وضعیت</TableHead>
             <TableHead>تاریخ عضویت</TableHead>
-            <TableHead className="text-right">عملیات</TableHead>
+            <TableHead>عملیات</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

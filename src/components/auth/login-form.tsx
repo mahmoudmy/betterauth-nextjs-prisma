@@ -64,12 +64,12 @@ export function LoginForm({
               <div className="grid gap-3">
                 <div className="flex items-center">
                   <Label htmlFor="password">رمز عبور</Label>
-                  <a
+                  {/* <a
                     href="#"
                     className="mr-auto inline-block text-sm underline-offset-4 hover:underline"
                   >
                     رمز عبور را فراموش کرده‌اید؟
-                  </a>
+                  </a> */}
                 </div>
                 <Input id="password" name="password" type="password" required />
               </div>
