@@ -51,6 +51,7 @@ export default function AdminUsersPage() {
 
   const fetchUsers = useCallback(async () => {
     try {
+      setLoading(true);
       const { data } = await admin.listUsers({
         query: {
           searchValue: search || undefined,
@@ -86,6 +87,7 @@ export default function AdminUsersPage() {
     }
   }, [search, roleFilter, page, pageSize]);
 
+  // Single useEffect to handle all data fetching
   useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
@@ -94,8 +96,6 @@ export default function AdminUsersPage() {
   useEffect(() => {
     setPage(1);
   }, [search, roleFilter, pageSize]);
-
-
 
   if (loading) {
     return (
