@@ -1,4 +1,4 @@
- "use client";
+"use client";
 
 import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,6 +8,7 @@ import { admin } from "@/lib/auth-client";
 import CreateUserDialog from "@/components/admin/create-user-dialog";
 import UserList from "@/components/admin/user-list";
 import { DataPagination } from "@/components/ui/data-pagination";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface User {
   id: string;
@@ -98,8 +99,14 @@ export default function AdminUsersPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
+      <div className="flex flex-col gap-4 items-center justify-center min-h-screen">
+        <div className="flex items-center space-x-4">
+          <Skeleton className="h-12 w-12 rounded-full" />
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-[250px]" />
+            <Skeleton className="h-4 w-[200px]" />
+          </div>
+        </div>
       </div>
     );
   }
@@ -152,13 +159,13 @@ export default function AdminUsersPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <UserList 
+          <UserList
             users={users}
             onEdit={(user) => {
               console.log(user);
             }}
           />
-            
+
           {/* Pagination Controls */}
           {meta.total && meta.total > pageSize && (
             <DataPagination

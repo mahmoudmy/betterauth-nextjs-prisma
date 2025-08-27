@@ -1,4 +1,4 @@
- "use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User, Settings as SettingsIcon } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function SettingsPage() {
   const { data: session } = useSession();
@@ -34,8 +35,14 @@ export default function SettingsPage() {
 
   if (!session?.user) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
+      <div className="flex flex-col gap-4 items-center justify-center min-h-screen">
+        <div className="flex flex-col space-y-3">
+          <Skeleton className="h-[125px] w-[250px] rounded-xl" />
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-[250px]" />
+            <Skeleton className="h-4 w-[200px]" />
+          </div>
+        </div>
       </div>
     );
   }

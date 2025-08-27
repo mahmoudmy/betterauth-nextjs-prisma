@@ -12,7 +12,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { signIn } from "@/lib/auth-client"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useState } from "react"
 
 export function LoginForm({
@@ -20,6 +20,7 @@ export function LoginForm({
   ...props
 }: React.ComponentProps<"div">) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -36,7 +37,9 @@ export function LoginForm({
     if (res.error) {
       setError(res.error.message || "Something went wrong.");
     } else {
-      router.push("/dashboard");
+      // Redirect to the original requested URL or dashboard as fallback
+      const redirectTo = searchParams.get('redirect') || '/dashboard';
+      router.push(redirectTo);
     }
   }
   
