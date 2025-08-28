@@ -40,6 +40,11 @@ export default function CreateUserDialog({ onCreated }: CreateUserDialogProps) {
     defaultValues: { name: "", email: "", password: "", username: "", role: "user" },
   });
 
+  const handleClose = () => {
+    setOpen(!open)
+    form.reset()
+  }
+
   const onSubmit = async (values: FormValues) => {
     await admin.createUser({
       email: values.email,
@@ -48,13 +53,12 @@ export default function CreateUserDialog({ onCreated }: CreateUserDialogProps) {
       role: values.role,
       data: { username: values.username },
     });
-    setOpen(false);
-    form.reset();
+    handleClose();
     onCreated?.();
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleClose}>
       <DialogTrigger asChild>
         <Button>
           <Plus className="h-4 w-4 ml-2" />
@@ -142,7 +146,7 @@ export default function CreateUserDialog({ onCreated }: CreateUserDialogProps) {
               )}
             />
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={form.formState.isSubmitting}>
+              <Button type="button" variant="outline" onClick={handleClose} disabled={form.formState.isSubmitting}>
                 انصراف
               </Button>
               <Button type="submit" disabled={form.formState.isSubmitting}>
