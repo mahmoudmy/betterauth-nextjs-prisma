@@ -164,6 +164,7 @@ export default function AdminUsersPage() {
             onEdit={(user) => {
               console.log(user);
             }}
+            onAction={fetchUsers}
           />
 
           {/* Pagination Controls */}

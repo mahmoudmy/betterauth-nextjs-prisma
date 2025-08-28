@@ -1,9 +1,8 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Edit } from "lucide-react";
+import UserActionsDropdown from "./user-actions-dropdown";
 
 interface User {
   id: string;
@@ -18,9 +17,10 @@ interface User {
 interface UserListProps {
   users: User[];
   onEdit?: (user: User) => void;
+  onAction?: () => void;
 }
 
-export default function UserList({ users, onEdit }: UserListProps) {
+export default function UserList({ users, onEdit, onAction }: UserListProps) {
   const getRoleBadge = (role?: string) => {
     switch (role) {
       case "admin":
@@ -47,7 +47,7 @@ export default function UserList({ users, onEdit }: UserListProps) {
             <TableHead>نقش</TableHead>
             <TableHead>وضعیت</TableHead>
             <TableHead>تاریخ عضویت</TableHead>
-            <TableHead>عملیات</TableHead>
+            <TableHead className="text-right">عملیات</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -66,15 +66,11 @@ export default function UserList({ users, onEdit }: UserListProps) {
               </TableCell>
               <TableCell>{formatDate(user.createdAt)}</TableCell>
               <TableCell className="text-right">
-                <div className="flex items-center justify-end gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => onEdit?.(user)}
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                </div>
+                <UserActionsDropdown 
+                  user={user} 
+                  onEdit={onEdit}
+                  onAction={onAction}
+                />
               </TableCell>
             </TableRow>
           ))}
