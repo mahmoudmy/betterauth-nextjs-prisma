@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "@/lib/auth-client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, UserCheck, Calendar, Activity } from "lucide-react";
+import { Users } from "lucide-react";
 
 export default function DashboardPage() {
   const router = useRouter();
