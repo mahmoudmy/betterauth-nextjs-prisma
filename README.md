@@ -53,7 +53,23 @@ Optional tools:
 npx prisma studio
 ```
 
-### 5) Run the app (development)
+### 5) Seed the database (optional but recommended)
+
+Create an admin user with default credentials:
+
+```bash
+npm run seed
+```
+
+This will create:
+- Admin user: `admin@example.com` / `admin123`
+- Admin role: `admin`
+- Password account for authentication
+- Session token for immediate access
+
+**⚠️  Important:** Change these default credentials in production!
+
+### 6) Run the app (development)
 
 ```bash
 npm run dev
@@ -73,10 +89,12 @@ npm start
 2. `npm install`
 3. `npx prisma generate`
 4. `npx prisma migrate dev` (or `npx prisma db push` for quick protos)
-5. `npm run dev`
+5. `npm run seed` (creates admin user)
+6. `npm run dev`
 
 ### Where things live
 - Prisma schema: `prisma/schema.prisma`
+- Database seeder: `prisma/seed.ts`
 - Better Auth config: `src/lib/auth.ts`
 - API routes: `src/app/api/**`
 - App routes/pages: `src/app/**`
@@ -84,5 +102,7 @@ npm start
 ### Troubleshooting
 - If Prisma types are missing after a schema change, re-run `npx prisma generate`.
 - If migrations drift, reset locally with `npx prisma migrate reset` (dev only), then generate again.
+- If you need to recreate the admin user, you can reset the database with `npx prisma migrate reset` and then run `npm run seed`.
+- The seeding script is idempotent - it won't create duplicate users if run multiple times.
 
 

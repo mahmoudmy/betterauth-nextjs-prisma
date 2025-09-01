@@ -45,9 +45,10 @@ export function LoginForm({
         router.push(redirectTo);
       }
     } catch (error) {
-      setLoading(false);
       setError("Something went wrong. Please try again.");
-    } 
+    } finally {
+      setLoading(false);
+    }
   }
   
   return (
