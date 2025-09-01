@@ -23,16 +23,27 @@ interface Department {
 export default function AdminDepartmentsPage() {
   const [departments, setDepartments] = useState<Department[]>([]);
   const [loading, setLoading] = useState(true);
+  const [tableLoading, setTableLoading] = useState(false);
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [meta, setMeta] = useState<{ total?: number; limit?: number; offset?: number }>({});
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
+  // Debounce search input
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300); // 300ms delay
+
+    return () => clearTimeout(timer);
+  }, [search]);
+
   const fetchDepartments = useCallback(async () => {
     try {
-      setLoading(true);
+      setTableLoading(true);
       const response = await fetch(
-        `/api/departments?page=${page}&limit=${pageSize}&search=${search}`,
+        `/api/departments?page=${page}&limit=${pageSize}&search=${debouncedSearch}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -54,9 +65,10 @@ export default function AdminDepartmentsPage() {
     } catch (error) {
       console.error("Error fetching departments:", error);
     } finally {
-      setLoading(false);
+      setTableLoading(false);
+      setLoading(false); // Set initial loading to false after first fetch
     }
-  }, [search, page, pageSize]);
+  }, [debouncedSearch, page, pageSize]);
 
   useEffect(() => {
     fetchDepartments();
@@ -64,9 +76,10 @@ export default function AdminDepartmentsPage() {
 
   useEffect(() => {
     setPage(1);
-  }, [search, pageSize]);
+  }, [debouncedSearch, pageSize]);
 
-  if (loading) {
+  // Only show full page loading on initial load
+  if (loading && departments.length === 0) {
     return (
       <div className="flex flex-col gap-4 items-center justify-center min-h-screen">
         <div className="flex items-center space-x-4">
@@ -117,10 +130,24 @@ export default function AdminDepartmentsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <DepartmentList
-            departments={departments}
-            onAction={fetchDepartments}
-          />
+          {tableLoading ? (
+            <div className="space-y-3">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="flex items-center space-x-4">
+                  <Skeleton className="h-12 w-12 rounded-full" />
+                  <div className="space-y-2 flex-1">
+                    <Skeleton className="h-4 w-[250px]" />
+                    <Skeleton className="h-4 w-[200px]" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <DepartmentList
+              departments={departments}
+              onAction={fetchDepartments}
+            />
+          )}
 
           {/* Pagination Controls */}
           {meta.total && meta.total > pageSize && (
