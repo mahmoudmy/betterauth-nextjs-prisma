@@ -12,6 +12,10 @@ interface User {
   role?: string;
   banned?: boolean;
   createdAt: string;
+  department?: {
+    id: string;
+    name: string;
+  };
 }
 
 interface UserListProps {
@@ -45,6 +49,7 @@ export default function UserList({ users, onEdit, onAction }: UserListProps) {
             <TableHead>نام کاربری</TableHead>
             <TableHead>ایمیل</TableHead>
             <TableHead>نقش</TableHead>
+            <TableHead>دپارتمان</TableHead>
             <TableHead>وضعیت</TableHead>
             <TableHead>تاریخ عضویت</TableHead>
             <TableHead className="text-right">عملیات</TableHead>
@@ -57,6 +62,13 @@ export default function UserList({ users, onEdit, onAction }: UserListProps) {
               <TableCell>@{user.username || "بدون نام کاربری"}</TableCell>
               <TableCell>{user.email || "بدون ایمیل"}</TableCell>
               <TableCell>{getRoleBadge(user.role)}</TableCell>
+              <TableCell>
+                {user.department ? (
+                  <Badge variant="outline">{user.department.name}</Badge>
+                ) : (
+                  <span className="text-muted-foreground text-sm">بدون دپارتمان</span>
+                )}
+              </TableCell>
               <TableCell>
                 {user.banned ? (
                   <Badge variant="destructive">مسدود</Badge>

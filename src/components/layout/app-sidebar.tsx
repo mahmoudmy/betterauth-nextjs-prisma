@@ -4,6 +4,7 @@ import * as React from "react"
 import {
   Users,
   LayoutDashboard,
+  Building2,
 } from "lucide-react"
 import { NavUser } from "@/components/layout/nav-user"
 import {
@@ -42,6 +43,11 @@ const navItems = [
         title: "کاربران",
         url: "/dashboard/admin/users",
         icon: Users,
+      },
+      {
+        title: "دپارتمان‌ها",
+        url: "/dashboard/admin/departments",
+        icon: Building2,
       },
     ]
   },

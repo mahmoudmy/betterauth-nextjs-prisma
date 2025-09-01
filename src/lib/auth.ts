@@ -14,5 +14,13 @@ export const auth = betterAuth({
     plugins: [
         username(),
         admin(),
-    ]
+    ],
+    user: {
+        additionalFields: {
+			departmentId: {
+				type: "string",
+				optional: true,
+			}
+		},
+    }
 });

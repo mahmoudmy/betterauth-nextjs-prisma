@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -25,6 +25,7 @@ const formSchema = z.object({
   password: z.string().min(6, "حداقل ۶ کاراکتر"),
   username: z.string(),
   role: z.enum(["user", "admin"]),
+  departmentId: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -35,10 +36,31 @@ interface CreateUserDialogProps {
 
 export default function CreateUserDialog({ onCreated }: CreateUserDialogProps) {
   const [open, setOpen] = useState(false);
+  const [departments, setDepartments] = useState<Array<{ id: string; name: string }>>([]);
+  
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: { name: "", email: "", password: "", username: "", role: "user" },
+    defaultValues: { name: "", email: "", password: "", username: "", role: "user", departmentId: "none" },
   });
+
+  // Fetch departments when dialog opens
+  useEffect(() => {
+    if (open) {
+      fetchDepartments();
+    }
+  }, [open]);
+
+  const fetchDepartments = async () => {
+    try {
+      const response = await fetch("/api/departments?limit=100");
+      if (response.ok) {
+        const data = await response.json();
+        setDepartments(data.departments);
+      }
+    } catch (error) {
+      console.error("Error fetching departments:", error);
+    }
+  };
 
   const handleClose = () => {
     setOpen(!open)
@@ -46,15 +68,23 @@ export default function CreateUserDialog({ onCreated }: CreateUserDialogProps) {
   }
 
   const onSubmit = async (values: FormValues) => {
-    await admin.createUser({
-      email: values.email,
-      password: values.password,
-      name: values.name,
-      role: values.role,
-      data: { username: values.username },
-    });
-    handleClose();
-    onCreated?.();
+    try {
+      await admin.createUser({
+        email: values.email,
+        password: values.password,
+        name: values.name,
+        role: values.role,
+        data: { 
+          username: values.username,
+          departmentId: values.departmentId === "none" ? undefined : values.departmentId,
+        },
+      });
+      handleClose();
+      onCreated?.();
+    } catch (error) {
+      console.error("Error creating user:", error);
+      alert("خطا در ایجاد کاربر");
+    }
   };
 
   return (
@@ -138,6 +168,31 @@ export default function CreateUserDialog({ onCreated }: CreateUserDialogProps) {
                       <SelectContent>
                         <SelectItem value="user">کاربر</SelectItem>
                         <SelectItem value="admin">مدیر سیستم</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="departmentId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>دپارتمان (اختیاری)</FormLabel>
+                  <FormControl>
+                    <Select onValueChange={field.onChange} value={field.value || "none"}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="انتخاب دپارتمان" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">بدون دپارتمان</SelectItem>
+                        {departments.map((dept) => (
+                          <SelectItem key={dept.id} value={dept.id}>
+                            {dept.name}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </FormControl>

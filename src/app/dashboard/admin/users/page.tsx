@@ -18,6 +18,10 @@ interface User {
   role?: string;
   banned?: boolean;
   createdAt: string;
+  department?: {
+    id: string;
+    name: string;
+  };
 }
 
 type AdminListedUser = {
@@ -28,6 +32,10 @@ type AdminListedUser = {
   role?: string;
   banned?: boolean;
   createdAt?: string;
+  department?: {
+    id: string;
+    name: string;
+  };
 };
 
 type AdminListUsersResponse = {
@@ -72,6 +80,7 @@ export default function AdminUsersPage() {
         role: u.role ?? undefined,
         banned: u.banned ?? false,
         createdAt: u.createdAt ?? new Date().toISOString(),
+        department: u.department,
       }));
       setUsers(mapped as User[]);
       if (res && 'total' in res) {
