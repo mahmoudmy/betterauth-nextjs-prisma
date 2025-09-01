@@ -63,10 +63,20 @@ export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
   const [meta, setMeta] = useState<{ total?: number; limit?: number; offset?: number }>({});
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+
+  // Debounce search input
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300); // 300ms delay
+
+    return () => clearTimeout(timer);
+  }, [search]);
 
   const fetchUsers = useCallback(async () => {
     try {
@@ -74,8 +84,8 @@ export default function AdminUsersPage() {
       
       // Build query parameters
       const params = new URLSearchParams();
-      if (search) {
-        params.append("searchValue", search);
+      if (debouncedSearch) {
+        params.append("searchValue", debouncedSearch);
         params.append("searchField", "name");
       }
       if (roleFilter) {
@@ -128,7 +138,7 @@ export default function AdminUsersPage() {
     } finally {
       setLoading(false);
     }
-  }, [search, roleFilter, page, pageSize]);
+  }, [debouncedSearch, roleFilter, page, pageSize]);
 
   // Single useEffect to handle all data fetching
   useEffect(() => {
@@ -138,7 +148,7 @@ export default function AdminUsersPage() {
   // Reset to first page when filters change
   useEffect(() => {
     setPage(1);
-  }, [search, roleFilter, pageSize]);
+  }, [debouncedSearch, roleFilter, pageSize]);
 
   if (loading) {
     return (
