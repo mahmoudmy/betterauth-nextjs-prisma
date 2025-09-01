@@ -62,6 +62,7 @@ type AdminListUsersResponse = {
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const [tableLoading, setTableLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
@@ -80,7 +81,7 @@ export default function AdminUsersPage() {
 
   const fetchUsers = useCallback(async () => {
     try {
-      setLoading(true);
+      setTableLoading(true);
       
       // Build query parameters
       const params = new URLSearchParams();
@@ -136,7 +137,8 @@ export default function AdminUsersPage() {
     } catch (error) {
       console.error("Error fetching users:", error);
     } finally {
-      setLoading(false);
+      setTableLoading(false);
+      setLoading(false); // Set initial loading to false after first fetch
     }
   }, [debouncedSearch, roleFilter, page, pageSize]);
 
@@ -150,7 +152,8 @@ export default function AdminUsersPage() {
     setPage(1);
   }, [debouncedSearch, roleFilter, pageSize]);
 
-  if (loading) {
+  // Only show full page loading on initial load
+  if (loading && users.length === 0) {
     return (
       <div className="flex flex-col gap-4 items-center justify-center min-h-screen">
         <div className="flex items-center space-x-4">
@@ -212,13 +215,27 @@ export default function AdminUsersPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <UserList
-            users={users}
-            onEdit={(user) => {
-              console.log(user);
-            }}
-            onAction={fetchUsers}
-          />
+          {tableLoading ? (
+            <div className="space-y-3">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="flex items-center space-x-4">
+                  <Skeleton className="h-12 w-12 rounded-full" />
+                  <div className="space-y-2 flex-1">
+                    <Skeleton className="h-4 w-[250px]" />
+                    <Skeleton className="h-4 w-[200px]" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <UserList
+              users={users}
+              onEdit={(user) => {
+                console.log(user);
+              }}
+              onAction={fetchUsers}
+            />
+          )}
 
           {/* Pagination Controls */}
           {meta.total && meta.total > pageSize && (
