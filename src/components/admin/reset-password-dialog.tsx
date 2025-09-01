@@ -31,6 +31,21 @@ interface User {
   id: string;
   name: string;
   email?: string;
+  username?: string;
+  role?: string;
+  banned?: boolean;
+  banReason?: string | null;
+  banExpires?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  departmentId?: string | null;
+  department?: {
+    id: string;
+    name: string;
+  } | null;
+  emailVerified?: boolean;
+  image?: string | null;
+  displayUsername?: string | null;
 }
 
 interface ResetPasswordDialogProps {

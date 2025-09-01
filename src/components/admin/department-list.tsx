@@ -143,8 +143,8 @@ export default function DepartmentList({ departments, onAction }: DepartmentList
           <AlertDialogHeader>
             <AlertDialogTitle>حذف دپارتمان</AlertDialogTitle>
             <AlertDialogDescription>
-              آیا مطمئن هستید که می‌خواهید دپارتمان "{departmentToDelete?.name}" را حذف کنید؟
-              {departmentToDelete?._count.users > 0 && (
+              آیا مطمئن هستید که می‌خواهید دپارتمان &quot;{departmentToDelete?.name}&quot; را حذف کنید؟
+              {departmentToDelete?._count?.users && departmentToDelete._count.users > 0 && (
                 <span className="block mt-2 text-red-600">
                   این دپارتمان {departmentToDelete._count.users} کاربر دارد و قابل حذف نیست.
                 </span>
@@ -155,7 +155,7 @@ export default function DepartmentList({ departments, onAction }: DepartmentList
             <AlertDialogCancel>انصراف</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
-              disabled={departmentToDelete?._count.users > 0}
+              disabled={departmentToDelete?._count?.users ? departmentToDelete._count.users > 0 : false}
               className="bg-red-600 hover:bg-red-700"
             >
               حذف

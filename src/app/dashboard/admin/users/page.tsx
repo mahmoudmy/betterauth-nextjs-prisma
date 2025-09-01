@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { admin } from "@/lib/auth-client";
+
 import CreateUserDialog from "@/components/admin/create-user-dialog";
 import UserList from "@/components/admin/user-list";
 import { DataPagination } from "@/components/ui/data-pagination";
@@ -17,11 +17,18 @@ interface User {
   username?: string;
   role?: string;
   banned?: boolean;
+  banReason?: string | null;
+  banExpires?: string | null;
   createdAt: string;
+  updatedAt: string;
+  departmentId?: string | null;
   department?: {
     id: string;
     name: string;
-  };
+  } | null;
+  emailVerified?: boolean;
+  image?: string | null;
+  displayUsername?: string | null;
 }
 
 type AdminListedUser = {
@@ -31,21 +38,25 @@ type AdminListedUser = {
   username?: string;
   role?: string;
   banned?: boolean;
+  banReason?: string | null;
+  banExpires?: string | null;
   createdAt?: string;
+  updatedAt?: string;
+  departmentId?: string | null;
   department?: {
     id: string;
     name: string;
-  };
+  } | null;
+  emailVerified?: boolean;
+  image?: string | null;
+  displayUsername?: string | null;
 };
 
 type AdminListUsersResponse = {
   users: AdminListedUser[];
   total: number;
-  limit?: number;
-  offset?: number;
-} | {
-  users: never[];
-  total: number;
+  limit: number;
+  offset: number;
 };
 
 export default function AdminUsersPage() {
@@ -60,18 +71,34 @@ export default function AdminUsersPage() {
   const fetchUsers = useCallback(async () => {
     try {
       setLoading(true);
-      const { data } = await admin.listUsers({
-        query: {
-          searchValue: search || undefined,
-          searchField: search ? "name" : undefined,
-          limit: pageSize,
-          offset: (page - 1) * pageSize,
-          ...(roleFilter
-            ? { filterField: "role", filterValue: roleFilter, filterOperator: "eq" }
-            : {}),
+      
+      // Build query parameters
+      const params = new URLSearchParams();
+      if (search) {
+        params.append("searchValue", search);
+        params.append("searchField", "name");
+      }
+      if (roleFilter) {
+        params.append("filterField", "role");
+        params.append("filterValue", roleFilter);
+        params.append("filterOperator", "eq");
+      }
+      params.append("limit", pageSize.toString());
+      params.append("offset", ((page - 1) * pageSize).toString());
+
+      const response = await fetch(`/api/users?${params.toString()}`, {
+        headers: {
+          "Content-Type": "application/json",
         },
       });
-      const res = data as AdminListUsersResponse | undefined;
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch users");
+      }
+
+      const data = await response.json();
+      const res = data as AdminListUsersResponse;
+      
       const mapped = (res?.users || []).map((u) => ({
         id: u.id,
         name: u.name ?? "",
@@ -79,16 +106,23 @@ export default function AdminUsersPage() {
         username: u.username ?? undefined,
         role: u.role ?? undefined,
         banned: u.banned ?? false,
+        banReason: u.banReason ?? null,
+        banExpires: u.banExpires ?? null,
         createdAt: u.createdAt ?? new Date().toISOString(),
+        updatedAt: u.updatedAt ?? new Date().toISOString(),
+        departmentId: u.departmentId ?? null,
         department: u.department,
+        emailVerified: u.emailVerified ?? false,
+        image: u.image ?? null,
+        displayUsername: u.displayUsername ?? null,
       }));
+      
       setUsers(mapped as User[]);
-      if (res && 'total' in res) {
-        const withMeta = res as { total: number; limit?: number; offset?: number };
-        setMeta({ total: withMeta.total, limit: withMeta.limit ?? pageSize, offset: withMeta.offset ?? (page - 1) * pageSize });
-      } else {
-        setMeta({});
-      }
+      setMeta({ 
+        total: res.total, 
+        limit: res.limit ?? pageSize, 
+        offset: res.offset ?? (page - 1) * pageSize 
+      });
     } catch (error) {
       console.error("Error fetching users:", error);
     } finally {
