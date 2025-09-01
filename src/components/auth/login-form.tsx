@@ -22,25 +22,32 @@ export function LoginForm({
   const router = useRouter();
   const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
+    setLoading(true);
 
-    const formData = new FormData(e.currentTarget);
+    try {
+      const formData = new FormData(e.currentTarget);
 
-    const res = await signIn.username({
-      username: formData.get("username") as string,
-      password: formData.get("password") as string,
-    });
+      const res = await signIn.username({
+        username: formData.get("username") as string,
+        password: formData.get("password") as string,
+      });
 
-    if (res.error) {
-      setError(res.error.message || "Something went wrong.");
-    } else {
-      // Redirect to the original requested URL or dashboard as fallback
-      const redirectTo = searchParams.get('redirect') || '/dashboard';
-      router.push(redirectTo);
-    }
+      if (res.error) {
+        setError(res.error.message || "Something went wrong.");
+      } else {
+        // Redirect to the original requested URL or dashboard as fallback
+        const redirectTo = searchParams.get('redirect') || '/dashboard';
+        router.push(redirectTo);
+      }
+    } catch (error) {
+      setLoading(false);
+      setError("Something went wrong. Please try again.");
+    } 
   }
   
   return (
@@ -62,6 +69,7 @@ export function LoginForm({
                   name="username"
                   type="text"
                   required
+                  disabled={loading}
                 />
               </div>
               <div className="grid gap-3">
@@ -74,11 +82,24 @@ export function LoginForm({
                     رمز عبور را فراموش کرده‌اید؟
                   </a> */}
                 </div>
-                <Input id="password" name="password" type="password" required />
+                <Input 
+                  id="password" 
+                  name="password" 
+                  type="password" 
+                  required 
+                  disabled={loading}
+                />
               </div>
               <div className="flex flex-col gap-3">
-                <Button type="submit" className="w-full">
-                  ورود
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? (
+                    <>
+                      <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                      در حال ورود...
+                    </>
+                  ) : (
+                    "ورود"
+                  )}
                 </Button>
               </div>
               {error && <p className="text-red-500">{error}</p>}
